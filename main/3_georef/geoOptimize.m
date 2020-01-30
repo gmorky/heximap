@@ -1,4 +1,5 @@
-function [] = geoOptimize(cL,iWinIdx,strRef,strShpPath,lVis,lPoly,hW)
+function [] = geoOptimize(cL,iWinIdx,strRef,strShpPath,lVis,lPoly, ...
+    lWin,dMaxDelZ,hW)
 % Nonlinear optimization of all windows to match the reference DEM
 
 % Get UTM zone and hemisphere
@@ -38,7 +39,7 @@ for iR = 1:iNumROI
     vWinIdx = find(vROI == vUniqueROI(iR));
 
     % Loop through each window in current region, and determine whether at
-    % least 1/3 of the image points were successfully triangulated. If not,
+    % least 33% of the image points were successfully triangulated. If not,
     % don't use points from the window during optimization.
     lSample = true(size(vWinIdx));
     iCount = 1;
@@ -71,7 +72,7 @@ for iR = 1:iNumROI
     
     % Nonlinear optimization
     iCount = 1; dRMSE = Inf; iAttempts = 3; cT = {}; cOutput = {};
-    while dRMSE > 20 && iCount <= iAttempts
+    while dRMSE > 25 && iCount <= iAttempts
         
         % Update command window
         disp(['  solver attempt ' num2str(iCount) ': '])
@@ -94,30 +95,65 @@ for iR = 1:iNumROI
     % Loop through each window in current region
     for iW = 1:numel(vWinIdx)
         
-        % Apply transformations from alignment and optimization routines
+        % Apply transformations from previous alignment and optimization
+        % routines
         iIdx = vWinIdx(iW);
         mPtsT = cL{iIdx}.TriangulatedPointsGeoref;
         for iT = 1:numel(cOutput)
             mPtsT = [cT{iT} * mPtsT; ones(1,size(mPtsT,2))];
             mPtsT = transformUsingSolverVar(mPtsT,cOutput{iT});
         end
+        
+        % Update command window
+        disp(['optimizing window ' num2str(iW) ' of region ' ...
+            num2str(iR) '...'])
+        
+        % Additional optimization of window if data coverage is at least
+        % 33%
+        mBnd = utm2ll([min(mPtsT(1:2,:),[],2) max(mPtsT(1:2,:),[],2)]', ...
+            iZ,strH);
+        [vX,vY,~,lM] = prepareRefDem(strRef,strShpPath,mBnd,iZ,strH);
+        [mX,mY] = meshgrid(vX,vY);
+        lIn = true(1,size(mPtsT,2));
+        lIn(interp2(mX,mY,double(lM),mPtsT(1,:),mPtsT(2,:)) > 0) = false;
+        lW = false;
+        if (sum(lIn) / ...
+                (prod(size(cL{iIdx},'Image')./cL{iIdx}.DisparityScale)) ...
+                > 0.33) && lWin
+            [cT{end+1},cOutput{end+1}] = ...
+                geoOptiTrans(geoSamplePoints(mPtsT,iNumPts),strRef, ...
+                strShpPath,iZ,strH,sOpt);
+            mPtsT = [cT{end} * mPtsT; ones(1,size(mPtsT,2))];
+            mPtsT = transformUsingSolverVar(mPtsT,cOutput{end});
+            lW = true;
+        end
 
         % Convert from UTM to WGS84 latitude and longitude
         mPtsT = utm2ll(mPtsT',iZ,strH)';
         
-        % Get boundaries then save points
+        % Remove any points which exceed the elevation difference threshold
         mBnd = [min(mPtsT(1:2,:),[],2) max(mPtsT(1:2,:),[],2)]';
+        [mDem,vLon,vLat] = geoGetRefDem(mBnd,strRef);
+        [mLon,mLat] = meshgrid(vLon,vLat);
+        lCut = abs(mPtsT(3,:) - ...
+            interp2(mLon,mLat,mDem,mPtsT(1,:),mPtsT(2,:))) > dMaxDelZ;
+        clear mLon mLat
+        mPtsT(:,lCut) = NaN;
+        
+        % Save triangulated points
         cL{iIdx}.TriangulatedPointsGeoref = mPtsT;
         clear mPtsT
         
-        % Save reference DEM     
-        [cL{iIdx}.ReferenceDem,cL{iIdx}.ReferenceLon, ...
-            cL{iIdx}.ReferenceLat] = geoGetRefDem(mBnd,strRef);
+        % Save reference DEM
+        cL{iIdx}.ReferenceDem = mDem;
+        cL{iIdx}.ReferenceLon = vLon;
+        cL{iIdx}.ReferenceLat = vLat;
 
         % Save georeferencing transformation data
         sGeo = cL{iIdx}.GeorefInfo;
         sGeo.Final.AlignmentOutput = cT;
         sGeo.Final.OptimizationOutput = cOutput;
+        sGeo.Final.WindowOptimizedSeparately = lW;
         cL{iIdx}.GeorefInfo = sGeo;
 
         % Save vertical root mean square error

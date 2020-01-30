@@ -184,7 +184,7 @@ vRec = [min(mWin(:,1)) min(mWin(:,2)) ...
     abs(diff(mWin(:,1))) abs(diff(mWin(:,2)))];
 rectangle('Position',vRec,'EdgeColor',[1 0.5 0])
 
-%Show (roughly georeferenced) image window
+% Show (roughly georeferenced) image window
 hF2 = figure;
 warning('off','images:initSize:adjustingMag');
 imshow(mI,'XData',[min(mWinWld(:,1)) max(mWinWld(:,1))], ...
@@ -195,13 +195,13 @@ warning('on','images:initSize:adjustingMag');
 set(gcf,'name','Control points','numbertitle','off')
 clear mI
 
-%Initialize variables
+% Initialize variables
 iC = 1;
 iNumPts = 5;
 mPtsI = zeros(iNumPts,2);
 mPtsW = zeros(iNumPts,3);
 
-%Loop for each point
+% Loop for each point
 while iC <= iNumPts
     
     % Error if user closes figure window
@@ -219,7 +219,7 @@ while iC <= iNumPts
         'Color',[1 0.5 0], ...
         'Background','k');
 
-    %User inputs image point
+    % User inputs image point
     hP = impoint; zoom out
     vPt = wait(hP);
     
@@ -230,7 +230,7 @@ while iC <= iNumPts
     % Make sure user input is valid
     while any(~lValidInput)
 
-        %User inputs world point
+        % User inputs world point
         cP = {'Control Point Longitude (dec):', ...
               'Control Point Latitude (dec):', ...
               'Elevation (meters):'};
@@ -285,7 +285,7 @@ while iC <= iNumPts
         scatter(vPt(1),vPt(2),'s','MarkerEdgeColor',[1 0.5 0], ...
             'LineWidth',1),pause(0.1)
         
-        %Save points
+        % Save points
         mPtsI(iC,:) = transformPointsInverse(sT,vPt) .* [1 -1];
         mPtsW(iC,:) = str2double(cIn)';
         

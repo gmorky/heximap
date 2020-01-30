@@ -22,7 +22,7 @@ function varargout = extract(varargin)
 
 % Edit the above text to modify the response to help extract
 
-% Last Modified by GUIDE v2.5 13-Sep-2016 21:07:59
+% Last Modified by GUIDE v2.5 29-Jan-2020 22:55:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -69,6 +69,10 @@ evalin('base','addpath(genpath(cd))');
 
 % Set default selection for spatial resolution of output
 set(handles.popupmenu1,'Value',2);
+
+% Initialize parameters
+iBlkSz = 3;
+assignin('base','iBlkSz',iBlkSz);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -139,4 +143,30 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 % Populate the menu
-set(hObject,'String',{'Very High';'High';'Medium';'Low'});
+set(hObject,'String',{'Full';'1/2';'1/4';'1/8'});
+
+
+
+function edit1_Callback(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit1 as text
+%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+
+% Get value
+iBlkSz = str2double(get(hObject,'String'));
+assignin('base','iBlkSz',iBlkSz);
+
+% --- Executes during object creation, after setting all properties.
+function edit1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

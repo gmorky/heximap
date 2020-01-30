@@ -1,4 +1,5 @@
-function [] = rasDem(objL,strWinPath,hW,cWin)
+function [] = rasDem(objL,strWinPath,lClean,lMed,lDen,iGap,iSpec,iMed, ...
+    iDenT,iDenN,hW,cWin)
 % Make raster grid DEM from georeferenced triangulated points
 
 % Update waitbar
@@ -10,6 +11,7 @@ end
 
 % Read triangulated points
 mPts = objL.TriangulatedPointsGeoref;
+mPts(:,any(isnan(mPts),1)) = [];
 
 % Compute reasonable resolution in geographic coordinate system, given the
 % spacing of the triangulated points
@@ -23,6 +25,7 @@ clear vRes vCount vIdx
 vC = ll2utm(mean(mPts(1:2,:),2)',sT.zone,sT.hemi);
 dRes = mean(abs(diff(utm2ll([vC;vC + dResM],sT.zone,sT.hemi))));
 dRes = dRes*2;
+dResM = dResM*2;
 
 % Boundaries
 mB = [min(mPts(1:2,:),[],2) max(mPts(1:2,:),[],2)]';
@@ -32,28 +35,37 @@ vY = fliplr(mB(3):dRes:mB(4));
 
 % Interpolation parameters
 sParams.blockSize = 500;
-sParams.null = -9999;
+sParams.null = NaN;
 sParams.connectedPixels = 0;
 sParams.radius = 0;
-sParams.matSource = objL.Properties.Source;
-sParams.matField = 'HexagonDem';
 
 % Interpolate to make raster DEM
-objL.(sParams.matField) = [];
-points2grid(mPts,vX,vY,'interp',sParams);
+mDem = points2grid(mPts,vX,vY,'interp',sParams);
 
-% Save spatial referencing structure
+% Clean up DEM
+mDem = rasClean(mDem,dResM,lClean,iGap,iSpec);
+
+% Median filter and mesh denoise 
+mDem = rasSmooth(vX,vY,mDem,lMed,lDen,iMed,iDenT,iDenN);
+
+% Set nodata value and numeric class
+mDem(isnan(mDem)) = -32768;
+mDem = int16(mDem);
+
+% Spatial referencing structure
 sR = georasterref;
 sR.Lonlim = [vX(1) vX(end)] + [-dRes dRes]/2;
 sR.Latlim = [vY(end) vY(1)] + [-dRes dRes]/2;
-sR.RasterSize = size(objL,sParams.matField);
+sR.RasterSize = size(mDem);
 sR.ColumnsStartFrom = 'north';
 sR.RowsStartFrom = 'west';
-objL.HexagonDemSpatialRef = sR;
 
 % Write a geotiff file
 strSaveFile = strcat([strWinPath 'dems\dem_r' ...
-    num2str(objL.RegionID) 'w' ...
+    num2str(objL.RegionID) '_w' ...
     num2str(objL.WindowID) '.tif']);
-geotiffwrite(strSaveFile,objL.HexagonDem,objL.HexagonDemSpatialRef, ...
-    'CoordRefSysCode','EPSG:4326');
+geotiffwrite(strSaveFile,mDem,sR,'CoordRefSysCode','EPSG:4326');
+
+% Save output
+objL.HexagonDem = mDem;
+objL.HexagonDemSpatialRef = sR;

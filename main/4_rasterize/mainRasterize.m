@@ -19,7 +19,8 @@ for iW = 1:numel(cL)
     cWin = {num2str(iW) num2str(numel(cL))};
     
     % Rasterize the DEM
-    rasDem(cL{iW},strWinPath,hW,cWin);
+    rasDem(cL{iW},strWinPath,lClean,lMed,lDen,iGap,iSpec,iMed,iDenT, ...
+        iDenN,hW,cWin);
     
     % Rasterize the orthoimage
     rasOrtho(cL{iW},strWinPath,hW,cWin);

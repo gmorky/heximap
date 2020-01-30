@@ -39,8 +39,12 @@ cPrompt = {'NW Corner Latitude (dec):', 'NW Corner Longitude (dec):', ...
            'NE Corner Latitude (dec):', 'NE Corner Longitude (dec):', ...
            'SE Corner Latitude (dec):', 'SE Corner Longitude (dec):', ...
            'SW Corner Latitude (dec):', 'SW Corner Longitude (dec):'};
-mSz = repmat([1 45],8,1);       
-cIn = inputdlg(cPrompt,strHexFile(1:end-4),mSz);
+cDef = cell(size(cPrompt));
+for i = 1:numel(cDef)
+    cDef{i} = '';
+end
+mSz = repmat([1 65],8,1);       
+cIn = inputdlg(cPrompt,['Image ID: ' strHexFile(1:end-4)],mSz,cDef,'on');
 mPtsWld = str2double([cIn(2:2:end) cIn(1:2:end)]);
 
 % Put corner coordinates in correct order. This assumes the Hexagon

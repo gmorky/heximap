@@ -24,8 +24,8 @@ geoInitTrans(cL{iWinIdx},strRef,strShpPath,lVis,hW);
 % Apply georeferencing transformations (from chosen window to all windows)
 geoApplyTrans(cL,cR,iWinIdx,hW);
 
-% Optimize orientation of all windows
-geoOptimize(cL,iWinIdx,strRef,strShpPath,lVis,lPoly,hW);
+% Optimize orientation of all regions
+geoOptimize(cL,iWinIdx,strRef,strShpPath,lVis,lPoly,lWin,dMaxDelZ,hW);
 
 % Update waitbar
 try

@@ -29,7 +29,8 @@ vLat = vLatH(1):-dRes:vLatH(end);
 % Make new DEM
 [mLon,mLat] = meshgrid(vLon,vLat);
 [mLonH,mLatH] = meshgrid(vLonH,vLatH);
-mDem = objL.HexagonDem; mDem(mDem == -9999) = NaN;
+mDem = double(objL.HexagonDem); 
+mDem(mDem < -500 | mDem > 9000) = NaN;
 mDem = interp2(mLonH,mLatH,mDem,mLon,mLat);
 clear mLonH mLatH
 

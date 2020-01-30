@@ -29,7 +29,7 @@ extInitTrans(cM,strHexPath,hW);
 cWindow = extChooseWindows(cM,hW);
 
 % Rectify the stereo images, compute disparity maps
-extDisparityLoop(cM,strHexPath,cWindow,strRes,hW);
+extDisparityLoop(cM,strHexPath,cWindow,strRes,iBlkSz,hW);
 
 % Refine camera orientations using bundle adjustment
 extBundleAdjustLoop(strHexPath,hW);

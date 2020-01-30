@@ -1,4 +1,4 @@
-function [] = extDisparity(objL,objR,strRes,hW,cWin)
+function [] = extDisparity(objL,objR,strRes,iBlkSz,hW,cWin)
 % Compute disparity maps
 
 % Update waitbar
@@ -18,13 +18,13 @@ sOpt.wiener2 = false;
 
 % Spatial resolution of output (disparity map resampling factors)
 switch strRes
-    case 'Very High'
+    case 'Full'
         vScale = [16 8 4 2 1];
-    case 'High'
+    case '1/2'
         vScale = [16 8 4 2];
-    case 'Medium'
+    case '1/4'
         vScale = [16 8 4];
-    case 'Low'
+    case '1/8'
         vScale = [16 8];
     otherwise
         error('Unknown scale tag.')
@@ -32,12 +32,11 @@ end
 
 % Define paramaters for disparity algorithm
 vD = [-8 8] * 30;
-iBlkSz = 15;
 sStereo.MinDisparity = vD(1);
 sStereo.NumDisparities = vD(2)-vD(1);
 sStereo.BlockSize = iBlkSz;
-sStereo.P1 = 0;
-sStereo.P2 = 32 * iBlkSz^2;
+sStereo.P1 = 64*iBlkSz^2;
+sStereo.P2 = 0;
 sStereo.Disp12MaxDiff = 1;
 sStereo.PreFilterCap = 0;
 sStereo.UniquenessRatio = 0;

@@ -151,7 +151,7 @@ end
 % Display vertical root-mean-square error   
 if strcmpi(strState,'iter')       
     disp(['  iteration ' num2str(iIter) ...
-        '... relative vertical RMSE (m): ' num2str(dRMSE)])  
+        '... approximate relative vertical RMSE (m): ' num2str(dRMSE)])  
 end
 end
 

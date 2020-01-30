@@ -22,7 +22,7 @@ function varargout = georef(varargin)
 
 % Edit the above text to modify the response to help georef
 
-% Last Modified by GUIDE v2.5 26-Aug-2019 12:55:20
+% Last Modified by GUIDE v2.5 26-Jan-2020 16:24:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,11 +64,17 @@ guidata(hObject, handles);
 % Clear workspace
 evalin('base','clear,clc');
 
-% Initialize checkboxes
+% Initialize parameters
+strCP = 'automatic';
+assignin('base','strCP',strCP);
 lVis = false;
 assignin('base','lVis',lVis);
 lPoly = false;
 assignin('base','lPoly',lPoly);
+lWin = false;
+assignin('base','lWin',lWin);
+dMaxDelZ = 200;
+assignin('base','dMaxDelZ',dMaxDelZ);
 
 % Make sure all folders are added to search path
 evalin('base','addpath(genpath(cd))'); 
@@ -127,11 +133,6 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Save control point selection method
-cRes = get(handles.popupmenu1,'String');
-strCP = cRes{get(handles.popupmenu1,'Value')};
-assignin('base','strCP',strCP);
-
 % Close the GUI
 close(handles.figure1)
 
@@ -147,6 +148,11 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu1
+
+% Save control point selection method
+cRes = get(hObject,'String');
+strCP = cRes{get(hObject,'Value')};
+assignin('base','strCP',strCP);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -189,3 +195,43 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % Get toggle state of checkbox
 lPoly = get(hObject,'Value');
 assignin('base','lPoly',lPoly);
+
+
+% --- Executes on button press in checkbox3.
+function checkbox3_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox3
+
+% Get toggle state of checkbox
+lWin = get(hObject,'Value');
+assignin('base','lWin',lWin);
+
+
+
+function edit1_Callback(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit1 as text
+%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+
+% Get value
+dMaxDelZ = str2double(get(hObject,'String'));
+assignin('base','dMaxDelZ',dMaxDelZ);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

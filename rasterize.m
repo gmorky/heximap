@@ -22,7 +22,7 @@ function varargout = rasterize(varargin)
 
 % Edit the above text to modify the response to help rasterize
 
-% Last Modified by GUIDE v2.5 11-Oct-2016 13:43:30
+% Last Modified by GUIDE v2.5 29-Jan-2020 22:28:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,6 +67,24 @@ evalin('base','clear,clc');
 %Make sure all folders are added to search path
 evalin('base','addpath(genpath(cd))'); 
 
+% Initialize parameters
+lClean = true;
+assignin('base','lClean',lClean);
+lMed = true;
+assignin('base','lMed',lMed);
+lDen = true;
+assignin('base','lDen',lDen);
+iGap = 3600;
+assignin('base','iGap',iGap);
+iSpec = 40000;
+assignin('base','iSpec',iSpec);
+iMed = 3;
+assignin('base','iMed',iMed);
+iDenT = 0.8;
+assignin('base','iDenT',iDenT);
+iDenN = 10;
+assignin('base','iDenN',iDenN);
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = rasterize_OutputFcn(hObject, eventdata, handles) 
@@ -102,3 +120,205 @@ close(handles.figure1)
 
 % Run main script
 evalin('base','mainRasterize');
+
+
+% --- Executes on button press in checkbox1.
+function checkbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox1
+
+% Get toggle state of checkbox
+lClean = get(hObject,'Value');
+assignin('base','lClean',lClean);
+
+% Show or hide parameters
+if lClean
+    handles.text2.Enable = 'on';
+    handles.text3.Enable = 'on';
+    handles.edit1.Enable = 'on';
+    handles.edit2.Enable = 'on';
+else
+    handles.text2.Enable = 'off';
+    handles.text3.Enable = 'off';
+    handles.edit1.Enable = 'off';
+    handles.edit2.Enable = 'off';
+end
+
+
+% --- Executes on button press in checkbox2.
+function checkbox2_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox2
+
+% Get toggle state of checkbox
+lMed = get(hObject,'Value');
+assignin('base','lMed',lMed);
+
+% Show or hide parameters
+if lMed
+    handles.text4.Enable = 'on';
+    handles.edit3.Enable = 'on';
+else
+    handles.text4.Enable = 'off';
+    handles.edit3.Enable = 'off';
+end
+
+
+% --- Executes on button press in checkbox3.
+function checkbox3_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox3
+
+% Get toggle state of checkbox
+lDen = get(hObject,'Value');
+assignin('base','lDen',lDen);
+
+% Show or hide parameters
+if lDen
+    handles.text5.Enable = 'on';
+    handles.text6.Enable = 'on';
+    handles.edit4.Enable = 'on';
+    handles.edit5.Enable = 'on';
+else
+    handles.text5.Enable = 'off';
+    handles.text6.Enable = 'off';
+    handles.edit4.Enable = 'off';
+    handles.edit5.Enable = 'off';
+end
+
+
+function edit1_Callback(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit1 as text
+%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+
+% Get value
+iGap = str2double(get(hObject,'String'));
+assignin('base','iGap',iGap);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function edit2_Callback(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit2 as text
+%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+
+% Get value
+iSpec = str2double(get(hObject,'String'));
+assignin('base','iSpec',iSpec);
+
+% --- Executes during object creation, after setting all properties.
+function edit2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit3 as text
+%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+
+% Get value
+iMed = str2double(get(hObject,'String'));
+assignin('base','iMed',iMed);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function edit4_Callback(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit4 as text
+%        str2double(get(hObject,'String')) returns contents of edit4 as a double
+
+% Get value
+iDenT = str2double(get(hObject,'String'));
+assignin('base','iDenT',iDenT);
+
+% --- Executes during object creation, after setting all properties.
+function edit4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit5_Callback(hObject, eventdata, handles)
+% hObject    handle to edit5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit5 as text
+%        str2double(get(hObject,'String')) returns contents of edit5 as a double
+
+% Get value
+iDenN = str2double(get(hObject,'String'));
+assignin('base','iDenN',iDenN);
+
+% --- Executes during object creation, after setting all properties.
+function edit5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

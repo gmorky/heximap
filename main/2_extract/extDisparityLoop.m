@@ -1,4 +1,4 @@
-function [] = extDisparityLoop(cM,strHexPath,cWindow,strRes,hW)
+function [] = extDisparityLoop(cM,strHexPath,cWindow,strRes,iBlkSz,hW)
 % Rectify stereo images and compute disparity maps for each window
 
 % Update waitbar
@@ -86,7 +86,7 @@ for iW = 1:iNumWin
     extStereoRect(objL,objR,strSavePath,hW,cWin);
     
     % Compute disparity map 
-    extDisparity(objL,objR,strRes,hW,cWin);
+    extDisparity(objL,objR,strRes,iBlkSz,hW,cWin);
 
     catch objExc
 
