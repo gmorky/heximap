@@ -10,7 +10,7 @@ lDirIdx = [sDirData.isdir];
 cDir = {sDirData.name}';
 lFileIdx = false(size(cDir));
 for i = 1:length(cDir)
-    if strfind(cDir{i},strExt) == length(cDir{i})-length(strExt)+1;
+    if strfind(cDir{i},strExt) == length(cDir{i})-length(strExt)+1
         lFileIdx(i) = true;
     end
 end

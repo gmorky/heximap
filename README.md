@@ -6,7 +6,7 @@ HEXagon IMagery Automated Pipeline. MATLAB code for extracting digital elevation
 
 * MATLAB version 2018a or newer
 
-* MATLAB image processing, mapping, statistics, and optimization toolboxes.  Type `ver` in the MATLAB command window to see if you have these required toolboxes.
+* MATLAB image processing, mapping, statistics, and optimization toolboxes. Enter `ver` in the MATLAB command window to see if you have them installed.
 
 * [OpenCV](https://opencv.org) library
 
@@ -14,7 +14,9 @@ HEXagon IMagery Automated Pipeline. MATLAB code for extracting digital elevation
 
 * Digital scans of declassified Hexagon imagery provided by the United States Geological Survey (USGS). Check [EarthExplorer](http://earthexplorer.usgs.gov/)  (Data Sets >> Declassified Data >> Declass 2) for availability of cloud-free Hexagon images over your region of interest. The USGS can scan at 7 μm (higher resolution) or 14 μm (lower resolution). Currently HEXIMAP only supports 7 μm scans of film from the KH-9 Hexagon "Lower Resolution Mapping Camera".
 
-## Disclaimers 
+## Tips
+
+* Any external data used as input must be georeferenced in the WGS84 geographic coordinate system, with elevations specified in meters.
 
 * HEXIMAP uses computer vision algorithms to estimate the fundamental matrix for two-view geometry. If an observed scene is nearly planar, the fundamental matrix can only be determined up to three degrees of freedom and degenerate cases can occur. If your region of interest only contains very flat terrain, HEXIMAP will likely fail.
 
@@ -24,17 +26,17 @@ HEXagon IMagery Automated Pipeline. MATLAB code for extracting digital elevation
 
 ## Installation
 
-HEXIMAP uses OpenCV APIs for things like feature detection, disparity map computation, and stereo image rectification. The software package [mexopencv](https://kyamagu.github.io/mexopencv/) acts as the interface between MATLAB and OpenCV. Detailed instructions for setting up the environment are given in the mexopencv [readme](https://github.com/kyamagu/mexopencv) and [wiki](https://github.com/kyamagu/mexopencv/wiki). 
+HEXIMAP relies on OpenCV APIs for things like feature detection, disparity map computation, and stereo image rectification. The software package [mexopencv](https://kyamagu.github.io/mexopencv/) acts as the interface between MATLAB and OpenCV. Detailed instructions for setting up the environment are given in the mexopencv [readme](https://github.com/kyamagu/mexopencv) and [wiki](https://github.com/kyamagu/mexopencv/wiki). 
 
-After downloading the HEXIMAP repository, add it to your MATLAB path including all subdirectories using `addpath(genpath('/path/to/heximap'))`. Also add mexopencv to your MATLAB path using `addpath('/path/to/mexopencv')`.
+After downloading the HEXIMAP repository, add it to your MATLAB path including all subdirectories as `addpath(genpath('/path/to/heximap'))`. Also add mexopencv as `addpath('/path/to/mexopencv')`.
 
 ## Usage
 
-*Any external data input must be georeferenced using the WGS84 geographic coordinate system.* There are four stages in the HEXIMAP workflow. Each stage has a corresponding GUI where inputs and parameters can be specified before running:
+*Any external data used as input must be georeferenced in the WGS84 geographic coordinate system, with elevations specified in meters.* There are four stages in the HEXIMAP workflow. Each stage has a corresponding GUI where inputs and parameters can be specified before running:
 
 #### Stitch 
 
-Type `stitch` in the MATLAB command window. Hexagon image halves are stitched together using feature extraction and matching. This is required because film strips are digitally scanned by the USGS as left and right halves with some overlap.
+Enter `stitch` in the MATLAB command window. Hexagon image halves are stitched together using feature extraction and matching. This is required because film strips are digitally scanned by the USGS as left and right halves with some overlap.
 
 Input: 
 
@@ -48,7 +50,7 @@ Additional steps:
 
 #### Extract
 
-Type `extract` in the MATLAB command window. DEMs are extracted from a pair of Hexagon images over a region of interest. This is accomplished by estimating the fundamental matrix and relative camera pose matrices between an image pair via feature matching, then applying homography transforms for stereo rectification. Disparity maps are computed using semi-global block matching (SGBM) (Hirschmüller, 2008), relative camera orientations are refined using a bundle adjustment procedure, and DEM points are triangulated in the camera coordinate system.
+Enter `extract` in the MATLAB command window. DEMs are extracted from a pair of Hexagon images over a region of interest. This is accomplished by estimating the fundamental matrix and relative camera pose matrices between an image pair via feature matching, then applying homography transforms for stereo rectification. Disparity maps are computed using semi-global block matching (SGBM) (Hirschmüller, 2008), relative camera orientations are refined using a bundle adjustment procedure, and DEM points are triangulated in the camera coordinate system.
 
 Input: 
 
@@ -66,7 +68,7 @@ Additional steps:
 
 #### Georeference
 
-Type `georef` in the MATLAB command window. Extracted DEMs are georeferenced in a standard world coordinate system (WGS84). HEXIMAP attempts to shift, rotate, and scale the Hexagon DEMs to match an existing georeferenced DEM (SRTM usually works well) using terrain feature matching, an iterative closest point (ICP) algorithm, and nonlinear optimization.
+Enter `georef` in the MATLAB command window. Extracted DEMs are georeferenced in a standard world coordinate system (WGS84). HEXIMAP attempts to shift, rotate, and scale the Hexagon DEMs to match an existing georeferenced DEM (SRTM usually works well) using terrain feature matching, an iterative closest point (ICP) algorithm, and nonlinear optimization.
 
 Input:
 
@@ -94,7 +96,7 @@ Additional steps:
 
 #### Rasterize
 
-Type `rasterize` in the MATLAB command window. Georeferenced DEMs and orthoimages are rasterized and exported as geotiff files. Before exporting, the raster DEMs can (optionally) be cleaned up, spatially filtered, and denoised as described below. Exported rasters and orthoimages are saved in folders “/dems”, and “/images”, respectively. Any data gaps in the DEMs are assigned a NoData value of -32768.
+Enter `rasterize` in the MATLAB command window. Georeferenced DEMs and orthoimages are rasterized and exported as geotiff files. Before exporting, the raster DEMs can (optionally) be cleaned up, spatially filtered, and denoised as described below. Exported rasters and orthoimages are saved in folders “/dems”, and “/images”, respectively. Any data gaps in the DEMs are assigned a NoData value of -32768.
 
 Input:
 
@@ -102,7 +104,7 @@ Input:
 
 * Cleanup DEMs: Additional cleanup steps on the DEMs before exporting. This includes interpolating small gaps, a slight dilation of larger gaps to remove erroneous pixels along gap edges, and removal of isolated “speckles” i.e. small islands of pixels which are completely surrounded by NoData values (these speckles are often erroneous elevations).
 
-  * Gap threshold: Any data gaps smaller than this value (sq. meters) will be filled using bilinear interpolation.
+	* Gap threshold: Any data gaps smaller than this value (sq. meters) will be filled using bilinear interpolation.
 
   * Speckle threshold: Any isolated speckles smaller than this value (sq. meters) will be removed.
 
