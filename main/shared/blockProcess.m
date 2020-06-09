@@ -56,7 +56,8 @@ if lMat
     end
     if ~strcmp(strClass,strClassF)
         strClass = strClassF;
-        warning('Specified class and matfile variable class do not match.')
+        warning('block_process:class_match',  ...
+            'Specified class and matfile variable class do not match.')
     end
 end
 

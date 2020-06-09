@@ -185,7 +185,9 @@ sParams.matSource = objM.Properties.Source;
 sParams.matField = 'Image';  
 sParams.matStartIndex = [min(vY) min(vX)];
 sParams.transform = mT;
+warning('off','block_process:class_match')
 grid2grid(sInfoR,vX,vY,sParams);
+warning('on','block_process:class_match')
 
 end
 end

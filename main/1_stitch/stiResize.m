@@ -47,6 +47,8 @@ for i = 1:length(vScale)
     objM.(cFields{i+1}) = uint8(0);
     
     % Resample
+    warning('off','block_process:class_match')
     grid2grid(sInfo,vX,vY,sParams);
+    warning('on','block_process:class_match')
     
 end

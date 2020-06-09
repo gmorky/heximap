@@ -84,7 +84,7 @@ Input:
 
 * Show animation during optimization: This opens a figure to illustrate progress of georeferencing during the optimization.
 
-* Use polynomial surface correction: This applies a 3rd order polynomial surface correction to the Hexagon DEMs, which can sometimes help reduce georeferencing errors due to film distortions in the Hexagon imagery. However, this option can sometimes introduce new errors into the DEMs, particularly in regions where unstable terrain has been masked along DEM edges. Use with caution.
+* Use polynomial surface correction: This applies a 3rd order polynomial surface correction to the Hexagon DEMs, which can oftentimes help reduce georeferencing errors due to film distortions in the Hexagon imagery. However, this option also may introduce new errors into the DEMs, particularly in regions where unstable terrain has been masked along edges of processing windows. It may be best to try two HEXIMAP runs with and without applying this correction for comparison.
 
 * Perform additional optimization of individual windows: It is possible to for a user to define a region spanning multiple “windows” (also referred to as “boxes” in the DEM extraction section above). If this option is selected, each window within a single region will receive an additional optimization run after the primary optimization of the larger “region”. This can sometimes improve the overall georeferencing accuracy. Note: only windows with greater than 33% terrain data coverage will receive the additional optimization step.
 
